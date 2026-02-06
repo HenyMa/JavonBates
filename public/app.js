@@ -21,6 +21,7 @@ async function loadMedia() {
     
     if (item.type === 'video') {
       const video = document.createElement('video');
+      video.className = 'media-video';
       video.src = '/uploads/' + encodeURIComponent(item.name);
       video.controls = true;
       video.style.maxWidth = '100%';
@@ -108,3 +109,17 @@ async function deleteMedia(filename) {
 }
 
 window.addEventListener('load', loadMedia);
+
+document.addEventListener('fullscreenchange', () => {
+  const fsEl = document.fullscreenElement;
+  const videos = document.querySelectorAll('video.media-video');
+  videos.forEach(v => {
+    if (fsEl === v) {
+      v.style.objectFit = 'contain';
+      v.style.background = '#000';
+    } else {
+      v.style.objectFit = 'cover';
+      v.style.background = '';
+    }
+  });
+});
