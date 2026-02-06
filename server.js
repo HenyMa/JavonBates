@@ -35,13 +35,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 // serve uploaded images statically
 app.use('/uploads', express.static(uploadDir));
 
-// list images
+// list images and videos
 app.get('/images', (req, res) => {
   fs.readdir(uploadDir, (err, files) => {
     if (err) return res.status(500).json({ error: 'Unable to read uploads' });
-    // filter common image extensions
-    const images = files.filter(f => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(f));
-    res.json(images);
+    // filter common image and video extensions
+    const media = files.filter(f => /\.(png|jpe?g|gif|webp|bmp|svg|mp4|webm|mov|avi|mkv)$/i.test(f));
+    // return with type info
+    const items = media.map(f => ({
+      name: f,
+      type: /\.(mp4|webm|mov|avi|mkv)$/i.test(f) ? 'video' : 'image'
+    }));
+    res.json(items);
   });
 });
 
@@ -49,6 +54,28 @@ app.get('/images', (req, res) => {
 app.post('/upload', basicAuth, upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
   res.json({ filename: req.file.filename });
+});
+
+// delete endpoint (protected)
+app.post('/delete', basicAuth, (req, res) => {
+  const { filename } = req.body;
+  if (!filename) return res.status(400).json({ error: 'No filename provided' });
+  
+  // sanitize filename to prevent directory traversal
+  if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+    return res.status(400).json({ error: 'Invalid filename' });
+  }
+  
+  const filepath = path.join(uploadDir, filename);
+  fs.unlink(filepath, (err) => {
+    if (err) return res.status(500).json({ error: 'Unable to delete file' });
+    res.json({ success: true });
+  });
+});
+
+// admin check endpoint (for keyboard shortcut auth)
+app.get('/admin-check', basicAuth, (req, res) => {
+  res.json({ authenticated: true });
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

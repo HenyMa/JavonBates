@@ -2,7 +2,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const user = document.getElementById('username').value || 'admin';
   const pass = document.getElementById('password').value || '';
-  const fileInput = document.getElementById('imageInput');
+  const fileInput = document.getElementById('mediaInput');
   const file = fileInput.files[0];
   const status = document.getElementById('status');
   if (!file) return status.textContent = 'Select a file first.';
@@ -20,6 +20,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
     }
     const json = await res.json();
     status.textContent = 'Uploaded: ' + json.filename;
+    fileInput.value = '';
   } catch (err) {
     status.textContent = 'Error: ' + err.message;
   }

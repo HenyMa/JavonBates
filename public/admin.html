@@ -9,13 +9,13 @@
 <body>
   <header>
     <h1>Admin Upload</h1>
-    <a class="admin-link" href="/">Gallery</a>
+    <a class="admin-link" href="/?admin">Gallery</a>
   </header>
   <main>
     <form id="uploadForm">
       <label>Username: <input id="username" value="admin"></label>
       <label>Password: <input id="password" type="password" placeholder="admin password"></label>
-      <label>Select image: <input id="imageInput" name="image" type="file" accept="image/*"></label>
+      <label>Select image or video: <input id="mediaInput" name="media" type="file" accept="image/*,video/*"></label>
       <button type="submit">Upload</button>
     </form>
     <div id="status"></div>

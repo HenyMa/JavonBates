@@ -9,10 +9,15 @@
 <body>
   <header>
     <h1>Image Gallery</h1>
-    <a class="admin-link" href="/admin.html">Admin</a>
   </header>
   <main>
     <div id="gallery" class="grid"></div>
+    <div id="sizeControl" style="display:none;margin:1rem;padding:1rem;background:#f0f0f0;border-radius:6px;">
+      <label>Image size: 
+        <input id="sizeSlider" type="range" min="150" max="400" value="280" style="width:200px;">
+        <span id="sizeValue">280px</span>
+      </label>
+    </div>
   </main>
   <script src="/app.js"></script>
 </body>
