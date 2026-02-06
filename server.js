@@ -22,7 +22,7 @@ const upload = multer({ storage });
 // simple basic auth middleware for admin routes
 function basicAuth(req, res, next) {
   const auth = req.headers.authorization;
-  const adminPass = process.env.ADMIN_PASS || 'password';
+  const adminPass = process.env.ADMIN_PASS || 'JavonBates1234';
   const expected = 'Basic ' + Buffer.from(`admin:${adminPass}`).toString('base64');
   if (auth === expected) return next();
   res.set('WWW-Authenticate', 'Basic realm="Admin"');
