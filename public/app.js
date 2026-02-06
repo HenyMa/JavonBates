@@ -2,6 +2,11 @@ let currentSize = 280;
 const sizeSlider = document.getElementById('sizeSlider');
 const sizeValue = document.getElementById('sizeValue');
 const sizeControl = document.getElementById('sizeControl');
+if (sizeSlider && sizeValue) {
+  sizeSlider.value = String(currentSize);
+  sizeValue.textContent = currentSize + 'px';
+  document.documentElement.style.setProperty('--media-size', currentSize + 'px');
+}
 
 async function loadMedia() {
   const res = await fetch('/images');
@@ -19,7 +24,6 @@ async function loadMedia() {
       video.src = '/uploads/' + encodeURIComponent(item.name);
       video.controls = true;
       video.style.maxWidth = '100%';
-      video.style.height = currentSize + 'px';
       video.style.objectFit = 'cover';
       video.style.borderRadius = '4px';
       div.appendChild(video);
@@ -27,7 +31,6 @@ async function loadMedia() {
       const img = document.createElement('img');
       img.src = '/uploads/' + encodeURIComponent(item.name);
       img.alt = item.name;
-      img.style.height = currentSize + 'px';
       div.appendChild(img);
     }
     
@@ -36,13 +39,13 @@ async function loadMedia() {
 }
 
 // Size control
-sizeSlider.addEventListener('input', (e) => {
-  currentSize = parseInt(e.target.value);
-  sizeValue.textContent = currentSize + 'px';
-  document.querySelectorAll('.card img, .card video').forEach(el => {
-    el.style.height = currentSize + 'px';
+if (sizeSlider) {
+  sizeSlider.addEventListener('input', (e) => {
+    currentSize = parseInt(e.target.value);
+    if (sizeValue) sizeValue.textContent = currentSize + 'px';
+    document.documentElement.style.setProperty('--media-size', currentSize + 'px');
   });
-});
+}
 
 // Edit mode toggle - show admin panel with keyboard shortcut or URL param
 const isAdminMode = new URLSearchParams(window.location.search).has('admin');

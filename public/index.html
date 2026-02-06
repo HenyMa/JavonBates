@@ -7,18 +7,24 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header>
-    <h1>Image Gallery</h1>
-  </header>
-  <main>
-    <div id="gallery" class="grid"></div>
-    <div id="sizeControl" style="margin:1rem;padding:1rem;background:#f0f0f0;border-radius:6px;">
-      <label>Media size: 
-        <input id="sizeSlider" type="range" min="150" max="400" value="280" style="width:200px;">
-        <span id="sizeValue">280px</span>
-      </label>
+  <header class="topbar">
+    <div class="brand">
+      <span class="dot"></span>
+      <h1>Javon Bates Gallery</h1>
     </div>
-  </main>
+    </header>
+  <main class="page">
+    <section class="hero">
+      <div id="sizeControl">
+        <label>Media size
+          <input id="sizeSlider" type="range" min="150" max="420" value="280">
+          <span id="sizeValue">280px</span>
+        </label>
+      </div>
+    </section>
+    <div id="gallery" class="grid"></div>
+    </main>
   <script src="/app.js"></script>
 </body>
 </html>
+

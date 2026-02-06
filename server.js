@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { spawn } = require('child_process');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -55,8 +56,53 @@ app.get('/images', (req, res) => {
 app.post('/upload', basicAuth, upload.fields([{ name: 'media', maxCount: 1 }, { name: 'image', maxCount: 1 }]), (req, res) => {
   const file = (req.files && (req.files.media?.[0] || req.files.image?.[0])) || req.file;
   if (!file) return res.status(400).json({ error: 'No file uploaded' });
-  res.json({ filename: file.filename });
+
+  const isVideo = file.mimetype && file.mimetype.startsWith('video/');
+  if (!isVideo) return res.json({ filename: file.filename });
+
+  const inputPath = path.join(uploadDir, file.filename);
+  const parsed = path.parse(file.filename);
+  const outputName = `${parsed.name}-compressed.mp4`;
+  const outputPath = path.join(uploadDir, outputName);
+
+  compressVideo(inputPath, outputPath)
+    .then(() => {
+      fs.unlink(inputPath, () => res.json({ filename: outputName }));
+    })
+    .catch((err) => {
+      console.error('ffmpeg error:', err);
+      return res.status(500).json({ error: 'Video compression failed' });
+    });
 });
+
+function compressVideo(inputPath, outputPath) {
+  // Target: smaller files (720p, ~1.5Mbps video, 128kbps audio)
+  const args = [
+    '-y',
+    '-i', inputPath,
+    '-vf', 'scale=-2:720',
+    '-c:v', 'libx264',
+    '-preset', 'veryfast',
+    '-b:v', '1500k',
+    '-maxrate', '2000k',
+    '-bufsize', '3000k',
+    '-c:a', 'aac',
+    '-b:a', '128k',
+    '-movflags', '+faststart',
+    outputPath
+  ];
+
+  return new Promise((resolve, reject) => {
+    const proc = spawn('ffmpeg', args, { stdio: ['ignore', 'ignore', 'pipe'] });
+    let stderr = '';
+    proc.stderr.on('data', d => { stderr += d.toString(); });
+    proc.on('error', reject);
+    proc.on('close', code => {
+      if (code === 0) return resolve();
+      reject(new Error(stderr || `ffmpeg exited with code ${code}`));
+    });
+  });
+}
 
 // delete endpoint (protected)
 app.post('/delete', basicAuth, (req, res) => {
