@@ -30,6 +30,7 @@ function basicAuth(req, res, next) {
 }
 
 // serve public files
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // serve uploaded images statically
