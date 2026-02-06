@@ -8,7 +8,7 @@ document.getElementById('uploadForm').addEventListener('submit', async (e) => {
   if (!file) return status.textContent = 'Select a file first.';
 
   const form = new FormData();
-  form.append('image', file);
+  form.append('media', file);
 
   const auth = 'Basic ' + btoa(`${user}:${pass}`);
   try {

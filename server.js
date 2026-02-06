@@ -52,9 +52,10 @@ app.get('/images', (req, res) => {
 });
 
 // upload endpoint (protected)
-app.post('/upload', basicAuth, upload.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-  res.json({ filename: req.file.filename });
+app.post('/upload', basicAuth, upload.fields([{ name: 'media', maxCount: 1 }, { name: 'image', maxCount: 1 }]), (req, res) => {
+  const file = (req.files && (req.files.media?.[0] || req.files.image?.[0])) || req.file;
+  if (!file) return res.status(400).json({ error: 'No file uploaded' });
+  res.json({ filename: file.filename });
 });
 
 // delete endpoint (protected)

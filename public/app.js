@@ -63,7 +63,6 @@ document.addEventListener('keydown', (e) => {
 });
 
 function showAdminPanel() {
-  sizeControl.style.display = 'block';
   document.querySelectorAll('.card').forEach(card => {
     const btn = document.createElement('button');
     btn.textContent = '🗑';
