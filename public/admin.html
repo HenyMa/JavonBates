@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin - Upload</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Admin Upload</h1>
+    <a class="admin-link" href="/">Gallery</a>
+  </header>
+  <main>
+    <form id="uploadForm">
+      <label>Username: <input id="username" value="admin"></label>
+      <label>Password: <input id="password" type="password" placeholder="admin password"></label>
+      <label>Select image: <input id="imageInput" name="image" type="file" accept="image/*"></label>
+      <button type="submit">Upload</button>
+    </form>
+    <div id="status"></div>
+  </main>
+  <script src="/admin.js"></script>
+</body>
+</html>
