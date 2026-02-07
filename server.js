@@ -126,4 +126,41 @@ app.get('/admin-check', basicAuth, (req, res) => {
   res.json({ authenticated: true });
 });
 
+// --- Simple in-memory chat (persist to file for durability) ---
+const chatFile = path.join(__dirname, 'chat.json');
+function loadChat() {
+  try {
+    return JSON.parse(fs.readFileSync(chatFile, 'utf8'));
+  } catch { return []; }
+}
+function saveChat(msgs) {
+  fs.writeFileSync(chatFile, JSON.stringify(msgs));
+}
+let chatMessages = loadChat();
+let chatNextId = chatMessages.length ? Math.max(...chatMessages.map(m=>m.id))+1 : 1;
+
+// Get chat messages
+app.get('/chat-messages', (req, res) => {
+  res.json(chatMessages.slice(-100));
+});
+// Post chat message
+app.post('/chat-message', (req, res) => {
+  const { user, text } = req.body;
+  if (!user || !text) return res.status(400).json({ error: 'Missing user or text' });
+  const msg = { id: chatNextId++, user: user.slice(0,32), text: text.slice(0,300), time: Date.now() };
+  chatMessages.push(msg);
+  if (chatMessages.length > 200) chatMessages = chatMessages.slice(-200);
+  saveChat(chatMessages);
+  res.json({ ok: true });
+});
+// Admin delete chat message
+app.post('/chat-delete', basicAuth, (req, res) => {
+  const { id } = req.body;
+  const idx = chatMessages.findIndex(m => m.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Not found' });
+  chatMessages.splice(idx, 1);
+  saveChat(chatMessages);
+  res.json({ ok: true });
+});
+
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

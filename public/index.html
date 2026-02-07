@@ -25,8 +25,21 @@
       </div>
     </section>
     <div id="gallery" class="grid"></div>
+
+    <!-- Live Chat Area -->
+    <section id="chatSection" style="max-width:500px;margin:32px auto 0;">
+      <h2 style="margin-bottom:8px;">Live Chat</h2>
+      <div id="chatBox" style="border:1px solid #ccc;min-height:120px;max-height:220px;overflow-y:auto;padding:8px;background:#fafaff;"></div>
+      <div style="margin-top:8px;display:flex;gap:4px;">
+        <input id="chatUser" type="text" maxlength="32" placeholder="Your name" style="flex:1;max-width:120px;">
+        <input id="chatInput" type="text" maxlength="300" placeholder="Type a message..." style="flex:2;">
+        <button id="chatSend">Send</button>
+        <button id="chatAdmin" title="Admin mode" style="display:none;">Admin</button>
+      </div>
+    </section>
     </main>
   <script src="/app.js"></script>
+  <script src="/livechat.js"></script>
 </body>
 </html>
 

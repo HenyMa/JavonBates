@@ -159,6 +159,17 @@ button{
   transition:transform 0.2s ease,box-shadow 0.2s ease
 }
 button:hover{transform:translateY(-1px);box-shadow:0 16px 30px rgba(31,111,235,0.3)}
+
+/* Chat Styles */
+#chatSection{background:#fff;border-radius:12px;padding:1.2rem;border:1px solid rgba(13,15,20,0.1);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+#chatSection h2{margin:0 0 12px 0;font-size:1.2rem;color:#0d0f14}
+#chatBox{background:#f8f9fa;border-radius:8px;border:1px solid rgba(13,15,20,0.08);padding:8px;overflow-y:auto;margin-bottom:12px}
+#chatBox > div{padding:6px 8px;background:#fff;border-radius:4px;margin-bottom:4px;border-left:3px solid var(--accent)}
+#chatSection > div:last-of-type{display:flex;gap:6px;align-items:center}
+#chatUser{max-width:120px}
+#chatAdmin{background:#ff6b6b !important;box-shadow:0 12px 24px rgba(255,107,107,0.2) !important}
+#chatAdmin:hover{box-shadow:0 16px 30px rgba(255,107,107,0.3) !important}
+
 @media (max-width:860px){
   .hero{flex-direction:column;align-items:flex-start}
 }
