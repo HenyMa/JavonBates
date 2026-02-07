@@ -48,26 +48,49 @@ if (sizeSlider) {
   });
 }
 
-// Edit mode toggle - show admin panel with keyboard shortcut or URL param
-const isAdminMode = new URLSearchParams(window.location.search).has('admin');
-if (isAdminMode) {
+// Global admin mode state
+window.adminMode = {
+  enabled: new URLSearchParams(window.location.search).has('admin'),
+  password: null
+};
+
+if (window.adminMode.enabled) {
   showAdminPanel();
 }
 
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'k') {
     e.preventDefault();
-    const pass = prompt('Admin password:');
-    if (!pass) return;
-    fetch('/admin-check', {
-      headers: { 'Authorization': 'Basic ' + btoa('admin:' + pass) }
-    }).then(r => r.ok ? showAdminPanel() : alert('Wrong password'));
+    
+    if (window.adminMode.enabled) {
+      // Exit admin mode
+      window.adminMode.enabled = false;
+      window.adminMode.password = null;
+      removeAdminPanel();
+    } else {
+      // Enter admin mode
+      const pass = prompt('Admin password:');
+      if (!pass) return;
+      fetch('/admin-check', {
+        headers: { 'Authorization': 'Basic ' + btoa('admin:' + pass) }
+      }).then(r => {
+        if (r.ok) {
+          window.adminMode.enabled = true;
+          window.adminMode.password = pass;
+          showAdminPanel();
+        } else {
+          alert('Wrong password');
+        }
+      });
+    }
   }
 });
 
 function showAdminPanel() {
   document.querySelectorAll('.card').forEach(card => {
+    if (card.querySelector('.admin-delete-btn')) return;
     const btn = document.createElement('button');
+    btn.className = 'admin-delete-btn';
     btn.textContent = '🗑';
     btn.style.position = 'absolute';
     btn.style.top = '4px';
@@ -84,15 +107,21 @@ function showAdminPanel() {
   });
 }
 
+function removeAdminPanel() {
+  document.querySelectorAll('.admin-delete-btn').forEach(btn => btn.remove());
+}
+
 async function deleteMedia(filename) {
-  const pass = prompt('Admin password to confirm delete:');
-  if (!pass) return;
+  if (!window.adminMode.password) {
+    alert('Not in admin mode');
+    return;
+  }
   
   try {
     const res = await fetch('/delete', {
       method: 'POST',
       headers: {
-        'Authorization': 'Basic ' + btoa('admin:' + pass),
+        'Authorization': 'Basic ' + btoa('admin:' + window.adminMode.password),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ filename })

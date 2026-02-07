@@ -1,6 +1,5 @@
 // Simple polling-based live chat (no websockets)
-window.isAdminMode = false;
-let adminPassword = null;
+// Uses shared admin mode from app.js: window.adminMode
 
 // Get references to elements
 const chatBox = document.getElementById('chatBox');
@@ -20,7 +19,7 @@ async function loadMessages() {
       div.style = 'margin-bottom:6px;padding:6px;background:#f0f0f0;border-radius:3px;position:relative;';
       div.innerHTML = `<b>${msg.user}:</b> ${msg.text}`;
       
-      if (window.isAdminMode) {
+      if (window.adminMode && window.adminMode.enabled) {
         const del = document.createElement('button');
         del.textContent = '🗑';
         del.style = 'margin-left:8px;background:#ff4444;color:#fff;border:none;border-radius:3px;cursor:pointer;padding:2px 6px;font-size:12px;';
@@ -28,7 +27,7 @@ async function loadMessages() {
           const res = await fetch('/chat-delete', {
             method: 'POST',
             headers: {
-              'Authorization': 'Basic ' + btoa('admin:' + adminPassword),
+              'Authorization': 'Basic ' + btoa('admin:' + window.adminMode.password),
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ id: msg.id })
@@ -75,36 +74,16 @@ chatInput.addEventListener('keypress', (e) => {
   }
 });
 
-// Admin mode toggle (Ctrl+K)
-document.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'k') {
-    e.preventDefault();
-    if (!window.isAdminMode) {
-      const pass = prompt('Admin password:');
-      if (pass) {
-        fetch('/admin-check', {
-          headers: { 'Authorization': 'Basic ' + btoa('admin:' + pass) }
-        }).then(r => {
-          if (r.ok) {
-            window.isAdminMode = true;
-            adminPassword = pass;
-            chatAdminBtn.style.display = 'inline-block';
-            chatAdminBtn.style.backgroundColor = '#ff4444';
-            chatAdminBtn.style.color = '#fff';
-            loadMessages();
-          } else alert('Wrong password');
-        });
-      }
-    } else {
-      window.isAdminMode = false;
-      adminPassword = null;
-      chatAdminBtn.style.display = 'none';
-      chatAdminBtn.style.backgroundColor = '';
-      chatAdminBtn.style.color = '';
-      loadMessages();
-    }
+// Watch for admin mode changes and refresh messages
+const checkAdminInterval = setInterval(() => {
+  if (window.adminMode && window.adminMode.enabled) {
+    chatAdminBtn.style.display = 'inline-block';
+    chatAdminBtn.style.backgroundColor = '#ff4444';
+    chatAdminBtn.style.color = '#fff';
+  } else {
+    chatAdminBtn.style.display = 'none';
   }
-});
+}, 100);
 
 // Poll for new messages every 2 seconds
 setInterval(loadMessages, 2000);
